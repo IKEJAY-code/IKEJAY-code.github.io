@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { getPosts, formatDate, readingTime } from '../lib/writing';
+import { ui, text, localPath, type Lang } from '../lib/i18n';
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const t = ui[lang], posts = await getPosts(lang);
+const tags = [...new Set(posts.flatMap(post=>post.data.tags))];
+---
+<Base lang={lang} title={t.writing} description={text(lang,'Research notes, reading fragments, and thoughts beyond a paper.','黄裕杰的研究笔记、阅读记录与论文之外的思考。')}>
+  <section class="page-heading wrap"><p class="eyebrow">{text(lang,'WRITING / AN OPEN NOTEBOOK','写作 / 一本开放的笔记')}</p><h1>{text(lang,'A place to','给想法，')}<br /><em>{text(lang,'think things through.','留一点空间。')}</em></h1><p>{text(lang,'Not just the conclusion, but the path that led there.','不只记录结论，也留住抵达结论的过程。')}<br />{text(lang,'Research notes, reading fragments, and ideas taking shape.','研究笔记、阅读片段，以及一些慢慢成形的想法。')}</p><a class="text-link" href={localPath(lang,'/rss.xml')}>{t.subscribe}<Icon name="external" size={16} /></a></section>
+  <section class="wrap writing-archive" data-writing><div class="writing-controls" data-writing-controls hidden><label class="search-field"><Icon name="search" size={19} /><span class="sr-only">{t.search}</span><input type="search" name="q" placeholder={t.placeholder} autocomplete="off" data-search-input /></label><div class="filter-tags" role="group" aria-label={t.filter}><button type="button" class="filter-tag" data-filter="" aria-pressed="true">{t.allNotes}</button>{tags.map(tag=><button type="button" class="filter-tag" data-filter={tag} aria-pressed="false">{tag}</button>)}</div></div>
+    <p class="results-count mono" role="status" aria-live="polite" data-results>{posts.length} {t.notes}</p>
+    <div class="post-list">{posts.map((post,index)=><article class="post-row" data-post data-search={`${post.data.title} ${post.data.description} ${post.data.tags.join(' ')}`} data-tags={JSON.stringify(post.data.tags)}><span class="post-no mono">{String(index+1).padStart(2,'0')}</span><a class="post-main" href={localPath(lang,`/writing/${post.slug}/`)}><div class="post-tags">{post.data.tags.map(tag=><span>{tag}</span>)}{post.data.example && <span class="example-label">{t.example}</span>}</div><h2>{post.data.title}</h2><p>{post.data.description}</p></a><span class="post-date mono">{formatDate(post.data.pubDate,lang)}<small>{readingTime(post.body)} {t.minute}</small></span><a class="round-arrow" href={localPath(lang,`/writing/${post.slug}/`)} aria-label={`${t.read}: ${post.data.title}`}><Icon name="external" /></a></article>)}</div>
+    <div class="empty-state" data-no-results hidden><h2>{t.noResults}</h2><p>{t.noResultsHelp}</p><button class="button secondary" type="button" data-clear-search>{t.clear}</button></div><p class="quiet-note">{t.exampleArchive}</p><noscript><p class="quiet-note">{t.noJS}</p></noscript>
+  </section>
+</Base>

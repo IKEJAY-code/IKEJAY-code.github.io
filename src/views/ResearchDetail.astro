@@ -1,0 +1,20 @@
+---
+import Base from '../layouts/Base.astro';
+import PaperArt from '../components/PaperArt.astro';
+import Icon from '../components/Icon.astro';
+import { getPapers } from '../data/research';
+import { ui, text, localPath, type Lang } from '../lib/i18n';
+interface Props { lang: Lang; slug: string; }
+const { lang, slug } = Astro.props;
+const t = ui[lang], papers = getPapers(lang), paper = papers.find(p => p.slug === slug)!;
+---
+<Base lang={lang} title={paper.shortTitle} description={paper.summary}>
+  <article class="paper-detail wrap"><a class="back-link" href={localPath(lang,'/research/')}>← {t.allResearch}</a>
+    <div class="paper-meta"><span>{paper.venue} / {paper.year}</span>{paper.recognition && <span class="badge">✳ {paper.recognition}</span>}</div><h1>{paper.title}</h1>
+    <p class="detail-authors">{paper.authors.map((a,i) => <>{i > 0 && ' · '}{i === 0 ? <strong>{a}</strong> : a}</>)}</p>
+    <div class="paper-links">{paper.links.map(link => <a class:list={['button', link.download ? 'secondary' : 'primary']} href={link.href} download={link.download || undefined} target={link.download ? undefined : '_blank'} rel={link.download ? undefined : 'noopener noreferrer'}>{link.label}<Icon name={link.download ? 'download' : 'external'} size={17} /></a>)}</div>
+    <PaperArt kind={paper.slug} />
+    <div class="research-story"><aside class="mono">{t.researchNotes}<span>{paper.topics.join(' / ')}</span></aside><div class="prose"><h2>{t.question}</h2><p>{paper.question}</p><h2>{t.approach}</h2><p>{paper.approach}</p><h2>{t.evidence}</h2><p>{paper.evidence}</p><div class="source-note"><strong>{t.source}</strong><p>{paper.sourceNote}</p></div><details class="citation"><summary>{t.bibtex}{paper.slug === 'her-pde' ? text(lang,' (arXiv v1)','（arXiv v1）') : ''}</summary><pre tabindex="0"><code id="citation-text">{paper.citation}</code></pre><button class="button secondary copy-button" type="button" data-copy="citation-text" hidden>{t.copy}</button><p class="copy-status" role="status" aria-live="polite"></p></details></div></div>
+    <div class="next-project"><span class="eyebrow">{t.keepExploring}</span>{papers.filter(p=>p.slug !== paper.slug).map(p=><a href={localPath(lang,`/research/${p.slug}/`)}>{p.shortTitle}<Icon name="arrow" size={26} /></a>)}</div>
+  </article>
+</Base>

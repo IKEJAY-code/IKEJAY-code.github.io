@@ -1,0 +1,57 @@
+---
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import LanguageSwitch from '../components/LanguageSwitch.astro';
+import { profile } from '../data/profile';
+import { ui, localPath, alternatePath, text, type Lang } from '../lib/i18n';
+interface Props { title?: string; description?: string; noindex?: boolean; lang?: Lang; switchTo?: string; }
+const { title, noindex = false, lang = 'en', switchTo } = Astro.props;
+const t = ui[lang];
+const description = Astro.props.description || text(lang, profile.descriptionEn, profile.description);
+const path = Astro.url.pathname;
+const barePath = path.startsWith('/zh/') ? path.slice(3) : path;
+const otherPath = switchTo || alternatePath(path);
+const nav = ['/', '/research/', '/writing/', '/about/'].map((href,i)=>({href:localPath(lang,href),label:t.nav[i]}));
+const current = (href: string) => href === localPath(lang) ? path === href : path.startsWith(href);
+const fullTitle = title ? `${title} — Yujie Huang` : text(lang, 'Yujie Huang — Research, with curiosity.', '黄裕杰 — 研究，始于好奇。');
+const canonical = new URL(path, Astro.site);
+---
+<!doctype html>
+<html lang={lang === 'en' ? 'en' : 'zh-CN'}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6f5f0" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="en" href={new URL(lang === 'en' ? barePath : otherPath, Astro.site)} />
+    <link rel="alternate" hreflang="zh-CN" href={new URL(lang === 'zh' ? path : otherPath, Astro.site)} />
+    <link rel="alternate" hreflang="x-default" href={new URL(lang === 'en' ? path : otherPath, Astro.site)} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title={text(lang, 'Yujie Huang · Writing', '黄裕杰 · 写作')} href={localPath(lang,'/rss.xml')} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={lang === 'en' ? 'en_US' : 'zh_CN'} />
+    <meta property="og:image" content={new URL('/og.png', Astro.site)} />
+    <meta name="twitter:card" content="summary_large_image" />
+    {noindex && <meta name="robots" content="noindex,follow" />}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t.skip}</a>
+    <header class="site-header wrap">
+      <a class="wordmark" href={localPath(lang)} aria-label={t.home}><span class="brand-symbol" aria-hidden="true">y<span>.</span></span><span>{text(lang,'YUJIE HUANG','黄裕杰')}<span class="wordmark-sub">{text(lang,'A PERSONAL RESEARCH SPACE','一个持续生长的研究空间')}</span></span></a>
+      <nav class="desktop-nav" aria-label={t.mainNav}>{nav.map(({ href, label }) => <a href={href} aria-current={current(href) ? 'page' : undefined}>{label}</a>)}</nav>
+      <div class="header-actions"><LanguageSwitch lang={lang} href={otherPath} /><a class="header-contact" href={`mailto:${profile.email}`}>{t.contact}<Icon name="external" size={16} /></a><details class="mobile-nav"><summary aria-label={t.openNav}><Icon name="menu" /></summary><nav aria-label={t.mobileNav}>{nav.map(({ href, label }) => <a href={href} aria-current={current(href) ? 'page' : undefined}>{label}</a>)}<a href={`mailto:${profile.email}`}>{t.contact} ↗</a></nav></details></div>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="site-footer wrap">
+      <div><a class="footer-name" href={localPath(lang)}>{text(lang,'Yujie Huang','黄裕杰')}<span class="accent">.</span></a><p>{t.tagline}</p></div>
+      <div class="footer-links"><a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub <Icon name="external" size={14} /></a><a href={`mailto:${profile.email}`}>{text(lang,'Email','邮箱')}<Icon name="external" size={14} /></a><a href={localPath(lang,'/rss.xml')}>RSS <Icon name="external" size={14} /></a></div>
+      <div class="footer-meta"><span>© {new Date().getUTCFullYear()} Yujie Huang</span><span>NOCTURNE · IN DAYLIGHT</span><a href="#main">{t.backTop} ↑</a></div>
+    </footer>
+    <script>import '../scripts/site';</script>
+  </body>
+</html>

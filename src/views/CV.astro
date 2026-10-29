@@ -1,0 +1,28 @@
+---
+import { profile } from '../data/profile';
+import { getPapers } from '../data/research';
+import { text, localPath, cvFile, type Lang } from '../lib/i18n';
+import LanguageSwitch from '../components/LanguageSwitch.astro';
+import '../styles/cv.css';
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const papers = getPapers(lang), otherLang = lang === 'en' ? 'zh' : 'en';
+const bullets = lang === 'en' ? [
+  ['First author. Models continuous thought states with dissipative dynamics, using a lightweight Neural ODE controller and selective gates to stabilize long-horizon autoregressive reasoning.', 'Analyzes well-posedness, dissipativity, and incremental stability; studies reasoning robustness using the Llama and Qwen model families.'],
+  ['First author. Couples expression-tree search by a scientific agent with HEI numerical evaluation to jointly discover open-form PDE structures and unknown spatial coefficient fields.', 'Updated manuscript: 70/105 exact structure recoveries and 94.3% Pass@3 across seven two-dimensional PDE families. Technical-repeat validation on real microbial trajectories reduces continuous-prediction error by 15.7% versus a refitted linear reference.'],
+] : [
+  ['第一作者。论文以耗散动力系统描述连续思维状态，通过轻量 Neural ODE 控制器与选择性门控干预，提高长程自回归推理的稳定性。', '包含适定性、耗散性与增量稳定性分析，并在 Llama、Qwen 模型系列上研究推理鲁棒性。'],
+  ['第一作者。将科学智能体的表达式树搜索与 HEI 数值评估耦合，联合发现开放形式 PDE 结构和未知空间系数场。', '更新稿：七类二维 PDE，70/105 次精确结构恢复，Pass@3 为 94.3%；真实微生物轨迹技术重复验证中，相对重新拟合的线性参考模型降低 15.7% 连续预测误差。'],
+];
+---
+<!doctype html>
+<html lang={lang === 'en' ? 'en' : 'zh-CN'}><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><title>{text(lang,'Yujie Huang · CV','黄裕杰 · 中文简历')}</title><meta name="description" content={text(lang,profile.descriptionEn,profile.description)} /><link rel="icon" href="/favicon.svg" /><link rel="canonical" href={new URL(localPath(lang,'/cv/'), Astro.site)} /><link rel="alternate" hreflang="en" href={new URL('/cv/',Astro.site)} /><link rel="alternate" hreflang="zh-CN" href={new URL('/zh/cv/',Astro.site)} /></head><body>
+  <nav class="cv-toolbar" aria-label={text(lang,'CV actions','简历操作')}><a href={localPath(lang,'/about/')}>← {text(lang,'Back to website','返回网站')}</a><span>{text(lang,'CURRICULUM VITAE','个人简历')}</span><LanguageSwitch lang={lang} href={localPath(otherLang,'/cv/')} /><a href={cvFile(lang)} download>{text(lang,'Download PDF','下载 PDF')} ↓</a><button type="button" data-print hidden>{text(lang,'Print','打印')}</button></nav>
+  <main class="cv-page">
+    <header class="cv-header"><div><p class="cv-eyebrow">{text(lang,'RESEARCH PROFILE','学术简历')}</p><h1>{text(lang,'Yujie Huang','黄裕杰')}{lang === 'zh' && <span>Yujie Huang</span>}</h1><p class="cv-role">{text(lang,'Second-year master’s student','硕士研究生（二年级）')} · LLM / Agents / AI for Science</p><p class="cv-contact"><a href={`mailto:${profile.email}`}>{profile.email}</a><span> / </span><a href={profile.github}>github.com/IKEJAY-code</a></p></div></header>
+    <section><h2>{text(lang,'Education','教育背景')}</h2><div class="cv-row"><strong>{text(lang,profile.universityEn,profile.university)}</strong><span>{text(lang,'Master’s student · Year 2','硕士研究生 · 二年级')}</span></div><p>{text(lang,'Research areas: large language models (LLMs) and AI agents.','研究方向：大语言模型（LLM）、智能体（Agents）。')}</p></section>
+    <section><h2>{text(lang,'Selected Publications','研究论文')}</h2>{papers.map((paper,index)=><article class="cv-paper"><div class="cv-row"><h3>{String(index+1).padStart(2,'0')} / {paper.shortTitle}</h3><strong class="cv-venue">{paper.venue}{paper.recognition ? ` · ${paper.recognition}` : ''}</strong></div><p class="cv-paper-title">{paper.title}</p><p class="cv-authors">{paper.authors.map((a,i)=><>{i>0 && ', '}{i===0 ? <strong>{a}</strong>:a}</>)}</p><ul>{bullets[index].map(bullet=><li>{bullet}</li>)}</ul><a class="cv-paper-link" href={paper.links[0].href}>{paper.links[0].href}</a></article>)}</section>
+    <section><h2>{text(lang,'Honors & Recognition','荣誉与认可')}</h2><div class="cv-row"><strong>ICML 2026 Spotlight · Thinking in Flow</strong><span>2026</span></div><div class="cv-row"><strong>{text(lang,'Best Paper Nomination · UMI 2026 Youth Forum','UMI 2026 青年论坛 · 最佳论文提名')}</strong><span>2026</span></div><div class="cv-row"><strong>{text(lang,'First-Class Scholarship · Top 5%','一等奖学金 · Top 5%')}</strong><span>2026</span></div></section>
+    <section><h2>{text(lang,'Research Focus','研究关注')}</h2><p>{text(lang,'LLM reasoning & robustness / Scientific agents / Data-driven equation discovery','LLM 推理与鲁棒性 / 科学智能体 / 基于数据的方程发现')}</p></section>
+  </main><script>const button = document.querySelector<HTMLButtonElement>('[data-print]'); if (button) { button.hidden = false; button.addEventListener('click',()=>window.print()); }</script>
+</body></html>

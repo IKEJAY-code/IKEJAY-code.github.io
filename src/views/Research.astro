@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/Base.astro';
+import PaperCard from '../components/PaperCard.astro';
+import { getPapers } from '../data/research';
+import { ui, text, type Lang } from '../lib/i18n';
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const t = ui[lang], papers = getPapers(lang);
+---
+<Base lang={lang} title={t.research}>
+  <section class="page-heading wrap"><p class="eyebrow">{text(lang,'RESEARCH','研究')} / 2026 —</p><h1>{text(lang,'Following the','沿着问题，')}<br /><em>{text(lang,'interesting questions.','探索未知。')}</em></h1><p>{text(lang,'Language-model reasoning, AI agents, and scientific discovery.','关注大语言模型的推理、智能体，以及 AI 如何参与科学发现。')}<br />{text(lang,'A record of questions, methods, and evidence we can test.','这里记录问题、方法与可以被检验的证据。')}</p><div class="page-heading-meta mono">{text(lang,'02 PAPERS','02 篇论文')}<span>{text(lang,'LLM REASONING / SCIENTIFIC AGENTS','语言模型推理 / 科学智能体')}</span></div></section>
+  <section class="wrap research-archive"><div class="paper-grid">{papers.map((paper,index) => <PaperCard lang={lang} paper={paper} index={index} />)}</div><p class="quiet-note">{t.plotNote}</p></section>
+</Base>

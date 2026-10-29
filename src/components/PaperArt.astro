@@ -1,0 +1,9 @@
+---
+interface Props { kind: string; }
+const { kind } = Astro.props;
+const flow = Array.from({ length: 15 }, (_, i) => `M-20 ${30+i*11} C70 ${-55+i*18},110 ${180-i*2},205 ${65+i*6} S330 ${50+i*12},430 ${110+i*9}`);
+const contours = Array.from({ length: 16 }, (_, i) => ({ rx: 18+i*9, ry: 10+i*5 }));
+---
+<div class:list={['paper-art', kind === 'her-pde' ? 'paper-art-field' : 'paper-art-flow']} aria-hidden="true">
+  {kind === 'her-pde' ? <svg viewBox="0 0 400 250" fill="none"><g transform="translate(200 125) rotate(-23)">{contours.map((r,i) => <ellipse cx={Math.sin(i*.8)*9} cy={Math.cos(i*.65)*10} rx={r.rx} ry={r.ry} stroke="currentColor" opacity={.23+i*.025} stroke-width=".8" />)}</g><text x="20" y="228">HYPOTHESIZE → EVALUATE → REFINE</text></svg> : <svg viewBox="0 0 400 250" fill="none">{flow.map((d,i) => <path d={d} stroke="currentColor" opacity={.2+i*.04} stroke-width="1" />)}<text x="20" y="228">A CONTINUOUS THOUGHT STATE</text></svg>}
+</div>

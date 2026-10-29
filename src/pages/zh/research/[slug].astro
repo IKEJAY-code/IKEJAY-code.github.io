@@ -1,0 +1,7 @@
+---
+import View from '../../../views/ResearchDetail.astro';
+import { getPapers } from '../../../data/research';
+export function getStaticPaths() { return getPapers('zh').map(paper=>({ params: { slug:paper.slug }, props: { slug:paper.slug } })); }
+const { slug } = Astro.props;
+---
+<View lang="zh" slug={slug} />

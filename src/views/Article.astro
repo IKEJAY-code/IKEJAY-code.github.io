@@ -1,0 +1,20 @@
+---
+import Base from '../layouts/Base.astro';
+import { render } from 'astro:content';
+import { getPosts, formatDate, readingTime } from '../lib/writing';
+import { ui, text, localPath, type Lang } from '../lib/i18n';
+interface Props { lang: Lang; post: Awaited<ReturnType<typeof getPosts>>[number]; }
+const { lang, post } = Astro.props;
+const t = ui[lang], otherLang = lang === 'en' ? 'zh' : 'en';
+const counterpart = (await getPosts(otherLang)).find(p=>p.slug === post.slug);
+const switchTo = localPath(otherLang, counterpart ? `/writing/${counterpart.slug}/` : '/writing/');
+const { Content, headings } = await render(post);
+const toc = headings.filter(h=>h.depth===2);
+---
+<Base lang={lang} switchTo={switchTo} title={post.data.title} description={post.data.description} noindex={post.data.example}>
+  <div class="reading-progress" data-reading-progress aria-hidden="true"></div><article class="article wrap" data-article>
+    <header class="article-header"><a class="back-link" href={localPath(lang,'/writing/')}>← {t.allWriting}</a><div class="post-tags">{post.data.tags.map(tag=><a href={localPath(lang,`/writing/?tag=${encodeURIComponent(tag)}`)}>{tag}</a>)}</div><h1>{post.data.title}</h1><p>{post.data.description}</p><div class="article-meta mono"><time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate,lang)}</time><span>{readingTime(post.body)} {t.minute}</span><span>YUJIE HUANG</span></div>{post.data.example && <p class="example-notice">{t.exampleNotice}</p>}</header>
+    <div class="article-body">{toc.length>0 && <aside class="article-toc"><span class="eyebrow">{text(lang,'ON THIS PAGE','本页目录')}</span><nav aria-label={text(lang,'Table of contents','文章目录')}>{toc.map(h=><a href={`#${h.slug}`}>{h.text}</a>)}</nav></aside>}<div class="prose article-prose"><Content /></div></div>
+    <footer class="article-end"><p class="serif">{text(lang,'Thanks for reading.','谢谢阅读。')}</p><a class="text-link" href="mailto:YujieHuang0526@gmail.com">{text(lang,'Let’s talk about this note','聊聊这篇文章')} ↗</a><a href={localPath(lang,'/writing/')}>← {t.allWriting}</a></footer>
+  </article>
+</Base>

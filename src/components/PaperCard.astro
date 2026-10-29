@@ -1,0 +1,17 @@
+---
+import type { Paper } from '../data/research';
+import Icon from './Icon.astro';
+import PaperArt from './PaperArt.astro';
+import { localPath, type Lang } from '../lib/i18n';
+interface Props { paper: Paper; index: number; lang?: Lang; }
+const { paper, index, lang = 'en' } = Astro.props;
+const href = localPath(lang, `/research/${paper.slug}/`);
+---
+<article class="paper-card" data-reveal>
+  <a class="paper-image-link" href={href} tabindex="-1" aria-hidden="true"><PaperArt kind={paper.slug} /><span class="paper-image-no">0{index+1} / 2026</span><span class="paper-image-arrow"><Icon name="external" /></span></a>
+  <div class="paper-meta"><span>{paper.venue}</span>{paper.recognition && <span class="badge"><span class="badge-star">✳</span> {paper.recognition}</span>}</div>
+  <h3><a href={href}>{paper.shortTitle}<Icon name="external" size={21} /></a></h3>
+  <p class="paper-summary">{paper.summary}</p>
+  <p class="paper-authors">{paper.authors.slice(0,3).map((author,i) => <>{i > 0 && ', '}{i === 0 ? <strong>{author}</strong> : author}</>)}{paper.authors.length > 3 && ', et al.'}</p>
+  <div class="tags">{paper.topics.map(t => <span>{t}</span>)}</div>
+</article>

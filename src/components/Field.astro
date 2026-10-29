@@ -1,0 +1,20 @@
+---
+import Icon from './Icon.astro';
+import { ui, type Lang } from '../lib/i18n';
+interface Props { lang?: Lang; }
+const { lang = 'en' } = Astro.props;
+const t = ui[lang];
+const rings = Array.from({ length: 28 }, (_, i) => {
+  const t = (i / 27) * Math.PI;
+  return { rx: Math.sin(t) * 142, ry: Math.sin(t) * 43, cy: 200 + Math.cos(t) * 140 };
+});
+---
+<figure class="field" aria-label={t.fieldLabel}>
+  <div class="field-stage">
+    <div class="field-coordinate coord-top">( x, y, possibility )</div>
+    <svg class="field-fallback" viewBox="0 0 400 400" fill="none" aria-hidden="true">{rings.map(r => <ellipse cx="200" cy={r.cy} rx={r.rx} ry={r.ry} stroke="#688b87" stroke-width=".7" opacity=".6" transform="rotate(-25 200 200)" />)}</svg>
+    <canvas data-field aria-hidden="true"></canvas>
+    <span class="field-cross cross-a" aria-hidden="true">+</span><span class="field-cross cross-b" aria-hidden="true">+</span>
+  </div>
+  <figcaption><span><span class="status-dot"></span>{t.fieldCaption}</span><button class="motion-toggle" type="button" data-motion aria-pressed="false" aria-label={t.pauseMotion}><Icon name="pause" size={13} /><span data-motion-label>{t.pause}</span></button></figcaption>
+</figure>

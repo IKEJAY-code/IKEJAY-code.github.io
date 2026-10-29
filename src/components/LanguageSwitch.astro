@@ -1,0 +1,6 @@
+---
+import type { Lang } from '../lib/i18n';
+interface Props { lang: Lang; href: string; }
+const { lang, href } = Astro.props;
+---
+<a class="language-toggle" href={href} lang={lang === 'en' ? 'zh-CN' : 'en'} hreflang={lang === 'en' ? 'zh-CN' : 'en'} aria-label={lang === 'en' ? 'Switch to Chinese' : '切换为英文'} data-language-switch><span aria-hidden="true">◎</span>{lang === 'en' ? '中文' : 'EN'}</a>
