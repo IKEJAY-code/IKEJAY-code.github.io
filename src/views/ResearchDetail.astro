@@ -10,7 +10,7 @@ const t = ui[lang], papers = getPapers(lang), paper = papers.find(p => p.slug ==
 ---
 <Base lang={lang} title={paper.shortTitle} description={paper.summary}>
   <article class="paper-detail wrap"><a class="back-link" href={localPath(lang,'/research/')}>← {t.allResearch}</a>
-    <div class="paper-meta"><span>{paper.venue} / {paper.year}</span>{paper.recognition && <span class="badge">✳ {paper.recognition}</span>}</div><h1>{paper.title}</h1>
+    <div class="paper-meta"><span class="paper-venue">{paper.venue} / {paper.year}</span>{paper.recognition && <span class="badge"><span class="badge-star">✦</span> {paper.recognition}</span>}</div><h1>{paper.title}</h1>
     <p class="detail-authors">{paper.authors.map((a,i) => <>{i > 0 && ' · '}{i === 0 ? <strong>{a}</strong> : a}</>)}</p>
     <div class="paper-links">{paper.links.map(link => <a class:list={['button', link.download ? 'secondary' : 'primary']} href={link.href} download={link.download || undefined} target={link.download ? undefined : '_blank'} rel={link.download ? undefined : 'noopener noreferrer'}>{link.label}<Icon name={link.download ? 'download' : 'external'} size={17} /></a>)}</div>
     <PaperArt kind={paper.slug} />
