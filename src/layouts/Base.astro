@@ -15,6 +15,38 @@ const nav = ['/', '/research/', '/writing/', '/about/'].map((href,i)=>({href:loc
 const current = (href: string) => href === localPath(lang) ? path === href : path.startsWith(href);
 const fullTitle = title ? `${title} — Yujie Huang` : text(lang, 'Yujie Huang — Research, with curiosity.', '黄裕杰 — 研究，始于好奇。');
 const canonical = new URL(path, Astro.site);
+const siteUrl = new URL('/', Astro.site).toString();
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Person',
+      '@id': `${siteUrl}#person`,
+      name: profile.name,
+      alternateName: [profile.chineseName, 'yujiehuang', 'IKEJAY-code'],
+      url: siteUrl,
+      image: new URL('/images/yujie.jpg', Astro.site).toString(),
+      email: `mailto:${profile.email}`,
+      jobTitle: text(lang, profile.stageEn, profile.stage),
+      description: text(lang, profile.descriptionEn, profile.description),
+      affiliation: {
+        '@type': 'CollegeOrUniversity',
+        name: text(lang, profile.universityEn, profile.university),
+      },
+      knowsAbout: profile.interests,
+      sameAs: [profile.github],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${siteUrl}#website`,
+      url: siteUrl,
+      name: text(lang, profile.name, profile.chineseName),
+      alternateName: [profile.name, 'yujiehuang', profile.chineseName],
+      author: { '@id': `${siteUrl}#person` },
+      inLanguage: ['en', 'zh-CN'],
+    },
+  ],
+};
 ---
 <!doctype html>
 <html lang={lang === 'en' ? 'en' : 'zh-CN'}>
@@ -38,6 +70,7 @@ const canonical = new URL(path, Astro.site);
     <meta property="og:image" content={new URL('/og.png', Astro.site)} />
     <meta name="twitter:card" content="summary_large_image" />
     {noindex && <meta name="robots" content="noindex,follow" />}
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)} />
   </head>
   <body>
     <a class="skip-link" href="#main">{t.skip}</a>

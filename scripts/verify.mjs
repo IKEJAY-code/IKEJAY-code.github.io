@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
-import { join, extname, relative } from 'node:path';
+import { join, extname, relative, basename } from 'node:path';
 const root='dist';
 const walk=dir=>readdirSync(dir).flatMap(name=>{const path=join(dir,name);return statSync(path).isDirectory()?walk(path):[path]});
-const pages=walk(root).filter(path=>path.endsWith('.html'));
+const isVerificationFile=path=>/^google[0-9a-f]+\.html$/.test(basename(path));
+const pages=walk(root).filter(path=>path.endsWith('.html')&&!isVerificationFile(path));
 let links=0;
 for(const page of pages){
   const html=readFileSync(page,'utf8');
